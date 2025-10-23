@@ -1,0 +1,7 @@
+marker:
+  template:
+    path: classpath:/templates
+
+props:
+  config:
+    file-store-path: ../files

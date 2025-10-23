@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Gym Fitness</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #000;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #111;
+            border: 4px solid #7CFC00;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #000;
+            text-align: center;
+            padding: 30px 20px;
+            background-image: url('cid:goldengym');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(34, 55, 43, 0.9)), url(./goldengym.jpg);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .header h1 {
+            position: relative;
+            color: #7CFC00;
+            font-size: 40px;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .content h2 {
+            color: #7CFC00;
+            margin-top: 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #7CFC00;
+            color: #000;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #000;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #7CFC00;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GOLDEN GYM FITNESS</h1>
+        </div>
+
+        <div class="content">
+            <h2>Transform Your Body, Transform Your Life</h2>
+            <p>Join the Golden Gym family today and take your fitness to the next level. With expert trainers, modern
+                equipment, and a supportive community, your goals are within reach!</p>
+
+            <a href="https://www.instagram.com/goldengymke" class="btn" target="_blank">Follow Us on Instagram</a>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Golden Gym Fitness. All rights reserved.</p>
+            <p><a href="https://www.instagram.com/goldengymke" target="_blank">Instagram</a> |
+                <a href="#" target="_blank">Website</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
