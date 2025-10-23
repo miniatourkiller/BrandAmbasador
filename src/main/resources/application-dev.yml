@@ -5,3 +5,16 @@ marker:
 props:
   config:
     file-store-path: ../files
+
+spring:
+  application:
+    name: brand-ambasador
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://161.97.69.205:5432/brand-amb
+    username: remas
+    password: Pass@word1
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
