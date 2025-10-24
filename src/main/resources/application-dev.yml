@@ -24,4 +24,13 @@ rsa:
   public-key: classpath:certs/public_key.pem
 
 google:
-  client-id: 123456789.apps.googleusercontent.com
+  client:
+    id: 123456789.apps.googleusercontent.com
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  api-docs:
+    path: /v3/api-docs
+    enabled: true

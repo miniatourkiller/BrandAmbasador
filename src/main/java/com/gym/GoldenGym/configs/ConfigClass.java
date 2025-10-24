@@ -16,13 +16,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.gym.GoldenGym.utils.JWTService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.rentals.RentPayment.Components.Utils.JWTService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,7 +57,7 @@ public class ConfigClass {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http
         .csrf((csrf)->csrf.disable())
-        .authorizeHttpRequests((auth)->auth.requestMatchers("remas/api/v1/user/all/**", "/remas/api/v1/property/all/**", "/testmail/**","/v1/open/**",
+        .authorizeHttpRequests((auth)->auth.requestMatchers(
         "/v2/**",
                         "/v3/**",
                         "/v3/api-docs/**",
@@ -69,18 +69,8 @@ public class ConfigClass {
                         "/configuration/security",
                         "/api-docs/**",
                         "/swagger-ui/**",
-                        "/remas/api/v1/property/all",
-                        "/remas/api/v1/property/unit-types/get",
                         "/webjars/**",
-                        "/remas/api/v1/payment-validations/**",
-                        "/remas/api/v1/house-hunting/**",
-                        "/remas/api/v1/tech_documents/open/**",
-                        "/remas/api/v1/ratings/tech/**",
-                        "/remas/api/v1/checkout/payment-details/**",
-                        "/remas/api/v1/open/actuator/**",
                         "/actuator/**",
-                        "/remas/api/v1/checkout/process-token-payment",
-                        "/remas/api/v1/application-version/get-application-version/**",
                         "/swagger-ui.html").permitAll())
         .authorizeHttpRequests((auth)->auth.requestMatchers("/remas/api/v1/getters/landlord/**", "/remas/api/v1/property-user/**").hasAnyAuthority("LANDLORD"))
         .authorizeHttpRequests((auth)->auth.requestMatchers("/remas/api/v1/discipline/admin/**").hasAnyAuthority("ADMIN"))
