@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthorizationFilter extends OncePerRequestFilter{
     private final JWTService jwtService;
-    private List<String> publicRoutes = Arrays.asList();
+    private List<String> publicRoutes = Arrays.asList("/brand-manager/v1/auth/");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

@@ -70,10 +70,9 @@ public class ConfigClass {
                         "/api-docs/**",
                         "/swagger-ui/**",
                         "/webjars/**",
+                        "/brand-manager/v1/auth/**",
                         "/actuator/**",
                         "/swagger-ui.html").permitAll())
-        .authorizeHttpRequests((auth)->auth.requestMatchers("/remas/api/v1/getters/landlord/**", "/remas/api/v1/property-user/**").hasAnyAuthority("LANDLORD"))
-        .authorizeHttpRequests((auth)->auth.requestMatchers("/remas/api/v1/discipline/admin/**").hasAnyAuthority("ADMIN"))
         .authorizeHttpRequests((auth)->auth.anyRequest().authenticated())
         .sessionManagement((sessionManagement)-> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(new AuthorizationFilter(jwtService()), UsernamePasswordAuthenticationFilter.class)

@@ -30,8 +30,10 @@ public class AuthServicesImp implements AuthService {
     @Override
     public ResponseDto processIdTokenAndCreateJwt(GoogleAuthDto googleAuthDto) {
         try {
+            log.info("Login Attempt");
             GoogleIdToken idToken = verifier.verify(googleAuthDto.getIdToken());
             if (idToken == null) {
+                log.error("Invalid token ID");
                 return new ResponseDto(400, "Invalid token ID");
             }
 
@@ -50,7 +52,7 @@ public class AuthServicesImp implements AuthService {
                 log.info("User is new and is being created as a CLIENT");
                 User u = new User();
                 u.setEmail(email);
-                u.setFullName(familyName != null ? familyName : givenName);
+                u.setFullName(familyName != null ? familyName + " " + givenName : givenName);
                 u.setRole(Roles.CLIENT); // choose default role
                 return userRepository.save(u);
             });

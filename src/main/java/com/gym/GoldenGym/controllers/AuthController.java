@@ -1,6 +1,8 @@
 package com.gym.GoldenGym.controllers;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,11 +15,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("brand-manager/v1/auth")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/google")
-    public ResponseDto processIdTokenAndCreateJwt(GoogleAuthDto googleAuthDto) {
+    public ResponseDto processIdTokenAndCreateJwt(@RequestBody GoogleAuthDto googleAuthDto) {
         return authService.processIdTokenAndCreateJwt(googleAuthDto);
     };
 }
