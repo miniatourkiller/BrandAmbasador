@@ -6,4 +6,5 @@ import lombok.Data;
 public class OrderDto {
     private Long variantId;
     private int units;
+    private Coordinates coordinates;
 }

@@ -28,8 +28,12 @@ public class Order extends BaseEntity{
     private int units;
     private double totalAmount;
     private double transportCharge = 0.0;
+    @ManyToOne
+    private StoreLocation assignedStore;
     private boolean paid = false;
     private boolean delivered = false;
     @Column(columnDefinition = "TEXT")
     private String deliveryNotes;
+    private String longitude;
+    private String latitude;
 }

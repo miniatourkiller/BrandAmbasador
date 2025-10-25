@@ -9,5 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthResponse {
     private String jwt;
+    private String username;
+    private String role;
     private long expiresAt;
 }
