@@ -10,8 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -48,10 +46,5 @@ public class GoldenGymApplication {
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
 	} 
-
-	@Bean
-	public PasswordEncoder passEncoder(){
-		return new BCryptPasswordEncoder();
-	}
 
 }
