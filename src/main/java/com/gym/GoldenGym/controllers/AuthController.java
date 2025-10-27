@@ -1,5 +1,6 @@
 package com.gym.GoldenGym.controllers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/google")
-    public ResponseDto processIdTokenAndCreateJwt(@RequestBody GoogleAuthDto googleAuthDto) {
-        return authService.processIdTokenAndCreateJwt(googleAuthDto);
+    public ResponseEntity<ResponseDto> processIdTokenAndCreateJwt(@RequestBody GoogleAuthDto googleAuthDto) {
+        return ProcessResponse.processResponse(authService.processIdTokenAndCreateJwt(googleAuthDto));
     };
 }
