@@ -20,7 +20,7 @@ public class ItemVariant extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String variantQuantity;
+    private String metricMeasure;
     private double variantPrice;
     private double offerPrice;
     private String offerStartDateTime;//format yyyy-MM-dd HH:mm:ss

@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ItemRequestDto extends RequestDto {
+public class VariantRequestDto extends RequestDto {
     private String name;
     private Long categoryId;
-    private int minPrice;
-    private int maxPrice;
+    private Integer minPrice;
+    private Integer maxPrice;
 }

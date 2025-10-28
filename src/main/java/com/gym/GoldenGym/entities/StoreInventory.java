@@ -17,5 +17,7 @@ public class StoreInventory extends BaseEntity {
     private Long id;
     @ManyToOne
     private ItemVariant itemVariant;
+    @ManyToOne
+    private StoreLocation storeLocation;
     private int quantity;
 }
