@@ -18,17 +18,19 @@ public class ServiceOrderEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String orderNumber = "ORD-" + RandomGenerator.generateRandomString(8);
+    private String orderNumber = "SRV-" + RandomGenerator.generateRandomString(8);
     @ManyToOne
     private ServiceEntity service;
     @ManyToOne
     private User client;
+    @ManyToOne
+    private StoreLocation store;
     private String scheduledDateTime;
     private boolean completed = false;
     private boolean paid = false;
 
     public void setScheduledDateTime(String scheduledDateTime) {
-        if(scheduledDateTime != null) {
+        if (scheduledDateTime != null) {
             try {
                 this.scheduledDateTime = DateUtils.getDate(scheduledDateTime);
             } catch (Exception e) {

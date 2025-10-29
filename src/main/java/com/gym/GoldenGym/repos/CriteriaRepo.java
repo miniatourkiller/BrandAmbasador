@@ -9,11 +9,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.gym.GoldenGym.dtos.reqdtos.ItemFetch;
+import com.gym.GoldenGym.dtos.reqdtos.OrdersReq;
+import com.gym.GoldenGym.dtos.reqdtos.ServicesReq;
 import com.gym.GoldenGym.dtos.reqdtos.UserReqDto;
 import com.gym.GoldenGym.dtos.reqdtos.VariantRequestDto;
 import com.gym.GoldenGym.entities.Category;
 import com.gym.GoldenGym.entities.Item;
 import com.gym.GoldenGym.entities.ItemVariant;
+import com.gym.GoldenGym.entities.Order;
+import com.gym.GoldenGym.entities.ServiceEntity;
+import com.gym.GoldenGym.entities.ServiceOrderEntity;
 import com.gym.GoldenGym.entities.StoreLocation;
 import com.gym.GoldenGym.entities.User;
 
@@ -172,6 +177,154 @@ public class CriteriaRepo {
         // check role
         if (userReqDto.getRole() != null) {
             predicates.add(cb.equal(root.get("role"), userReqDto.getRole()));
+        }
+
+        return predicates;
+    }
+
+    public Page<ServiceOrderEntity> fetchServiceOrders(ServicesReq servicesReq, Long storeId) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<ServiceOrderEntity> cq = cb.createQuery(ServiceOrderEntity.class);
+        Root<ServiceOrderEntity> root = cq.from(ServiceOrderEntity.class);
+
+        List<Predicate> predicates = this.serviceOrdersPredicates(servicesReq, storeId, cb, root);
+
+        // count
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<ServiceOrderEntity> countRoot = countQuery.from(ServiceOrderEntity.class);
+        List<Predicate> countPredicates = this.serviceOrdersPredicates(servicesReq, storeId, cb, countRoot);
+        countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
+        Long count = em.createQuery(countQuery).getSingleResult();
+
+        // fetch
+        cq.select(root).where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.asc(root.get("id")));
+
+        Pageable pageable = PageRequest.of(servicesReq.getPageNumber(), servicesReq.getPageSize());
+
+        List<ServiceOrderEntity> orders = em.createQuery(cq)
+                .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+                .setMaxResults(pageable.getPageSize()).getResultList();
+        return new PageImpl<>(orders, pageable, count);
+    }
+
+    private List<Predicate> serviceOrdersPredicates(ServicesReq servicesReq, Long storeId, CriteriaBuilder cb,
+            Root<ServiceOrderEntity> root) {
+        List<Predicate> predicates = new java.util.ArrayList<>();
+
+        predicates.add(cb.equal(root.get("deleted"), false));
+
+        // check store
+        if (storeId != null) {
+            Join<ServiceOrderEntity, StoreLocation> storeJoin = root.join("store");
+            predicates.add(cb.equal(storeJoin.get("id"), storeId));
+        } else {
+            if (servicesReq.getStoreName() != null) {
+                Join<ServiceOrderEntity, StoreLocation> storeJoin = root.join("store");
+                predicates
+                        .add(cb.equal(cb.lower(storeJoin.get("storeName")), servicesReq.getStoreName().toLowerCase()));
+            }
+        }
+
+        // check client email
+        if (servicesReq.getClientEmail() != null) {
+            Join<ServiceOrderEntity, User> clientJoin = root.join("client");
+            predicates.add(cb.equal(cb.lower(clientJoin.get("email")), servicesReq.getClientEmail().toLowerCase()));
+        }
+
+        // check order number
+        if (servicesReq.getOrderNumber() != null) {
+            predicates.add(cb.equal(root.get("orderNumber"), servicesReq.getOrderNumber()));
+        }
+
+        // check service name
+        if (servicesReq.getServiceName() != null) {
+            Join<ServiceOrderEntity, ServiceEntity> serviceJoin = root.join("service");
+            predicates.add(
+                    cb.equal(cb.lower(serviceJoin.get("serviceName")), servicesReq.getServiceName().toLowerCase()));
+        }
+
+        // check paid
+        if (servicesReq.getPaid() != null) {
+            predicates.add(cb.equal(root.get("paid"), servicesReq.getPaid()));
+        }
+
+        // check completed
+        if (servicesReq.getCompleted() != null) {
+            predicates.add(cb.equal(root.get("completed"), servicesReq.getCompleted()));
+        }
+
+        return predicates;
+    }
+
+    public Page<Order> fetchOrders(OrdersReq ordersReq, Long storeId) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Order> cq = cb.createQuery(Order.class);
+        Root<Order> root = cq.from(Order.class);
+
+        List<Predicate> predicates = this.ordersPredicates(ordersReq, storeId, cb, root);
+
+        // count
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Order> countRoot = countQuery.from(Order.class);
+        List<Predicate> countPredicates = this.ordersPredicates(ordersReq, storeId, cb, countRoot);
+        countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
+        Long count = em.createQuery(countQuery).getSingleResult();
+
+        // fetch
+        cq.select(root).where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.asc(root.get("id")));
+
+        Pageable pageable = PageRequest.of(ordersReq.getPageNumber(), ordersReq.getPageSize());
+
+        List<Order> orders = em.createQuery(cq).setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+                .setMaxResults(pageable.getPageSize()).getResultList();
+        return new PageImpl<>(orders, pageable, count);
+    }
+
+    private List<Predicate> ordersPredicates(OrdersReq ordersReq, Long storeId, CriteriaBuilder cb, Root<Order> root) {
+        List<Predicate> predicates = new java.util.ArrayList<>();
+
+        predicates.add(cb.equal(root.get("deleted"), false));
+
+        // check store
+        if (storeId != null) {
+            Join<Order, StoreLocation> storeJoin = root.join("store");
+            predicates.add(cb.equal(storeJoin.get("id"), storeId));
+        } else {
+            if (ordersReq.getStoreName() != null) {
+                Join<Order, StoreLocation> storeJoin = root.join("store");
+                predicates
+                        .add(cb.equal(cb.lower(storeJoin.get("storeName")), ordersReq.getStoreName().toLowerCase()));
+            }
+
+        }
+
+        // check client email
+        if (ordersReq.getClientEmail() != null) {
+            Join<Order, User> clientJoin = root.join("client");
+            predicates.add(cb.equal(cb.lower(clientJoin.get("email")), ordersReq.getClientEmail().toLowerCase()));
+        }
+
+        // check order number
+        if (ordersReq.getOrderNumber() != null) {
+            predicates.add(cb.equal(root.get("orderNumber"), ordersReq.getOrderNumber()));
+        }
+
+        // check item name
+        if (ordersReq.getItemName() != null) {
+            Join<Order, Item> itemJoin = root.join("item");
+            predicates.add(cb.equal(cb.lower(itemJoin.get("itemName")), ordersReq.getItemName().toLowerCase()));
+        }
+
+        // check paid
+        if (ordersReq.getPaid() != null) {
+            predicates.add(cb.equal(root.get("paid"), ordersReq.getPaid()));
+        }
+
+        // check delivered
+        if (ordersReq.getDelivered() != null) {
+            predicates.add(cb.equal(root.get("delivered"), ordersReq.getDelivered()));
         }
 
         return predicates;

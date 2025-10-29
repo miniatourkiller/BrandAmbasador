@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OrdersReq extends RequestDto {
+public class ServicesReq extends RequestDto {
     private String orderNumber;
     private String clientEmail;
+    private String serviceName;
     private String storeName;
-    private String itemName;
     private Boolean paid;
-    private Boolean delivered;
+    private Boolean completed;
 }
