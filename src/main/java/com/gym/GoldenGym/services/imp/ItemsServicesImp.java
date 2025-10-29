@@ -14,6 +14,7 @@ import com.gym.GoldenGym.dtos.ItemDto;
 import com.gym.GoldenGym.dtos.ItemVariantDto;
 import com.gym.GoldenGym.dtos.MultiCategoryDto;
 import com.gym.GoldenGym.dtos.ResponseDto;
+import com.gym.GoldenGym.dtos.InventoryAdjustDto.Action;
 import com.gym.GoldenGym.dtos.reqdtos.ItemFetch;
 import com.gym.GoldenGym.dtos.reqdtos.VariantRequestDto;
 import com.gym.GoldenGym.entities.Category;
@@ -266,8 +267,17 @@ public class ItemsServicesImp implements ItemsServices {
             inventory.save(storeInventory);
             return new ResponseDto(200, "Success");
         }
-        storeInventory.setQuantity(storeInventory.getQuantity() + adminInventoryAdjustDto.getQuantity());
-        inventory.save(storeInventory);
+        if (adminInventoryAdjustDto.getAction().equals(Action.INCREASE)) {
+            storeInventory.setQuantity(storeInventory.getQuantity() + adminInventoryAdjustDto.getQuantity());
+            inventory.save(storeInventory);
+        } else {
+            if (storeInventory.getQuantity() < adminInventoryAdjustDto.getQuantity()) {
+                return new ResponseDto(400, "Not enough inventory");
+            }
+            storeInventory.setQuantity(storeInventory.getQuantity() - adminInventoryAdjustDto.getQuantity());
+            inventory.save(storeInventory);
+        }
+
         return new ResponseDto(200, "Success");
     }
 

@@ -2,12 +2,13 @@ package com.gym.GoldenGym.dtos.reqdtos;
 
 import com.gym.GoldenGym.entities.enums.Roles;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class UserReqDto {
+@Getter
+@Setter
+public class UserReqDto extends RequestDto{
     private String email;
-    private String idNumber;
     private Roles role;
     private String storeName;
     private Long storeId;

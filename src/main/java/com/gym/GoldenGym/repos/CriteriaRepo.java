@@ -9,10 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.gym.GoldenGym.dtos.reqdtos.ItemFetch;
+import com.gym.GoldenGym.dtos.reqdtos.UserReqDto;
 import com.gym.GoldenGym.dtos.reqdtos.VariantRequestDto;
 import com.gym.GoldenGym.entities.Category;
 import com.gym.GoldenGym.entities.Item;
 import com.gym.GoldenGym.entities.ItemVariant;
+import com.gym.GoldenGym.entities.StoreLocation;
+import com.gym.GoldenGym.entities.User;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -78,7 +81,8 @@ public class CriteriaRepo {
             }
         }
         if (itemRequestDto.getName() != null) {
-            predicates.add(cb.like(itemJoin.get("itemName"), "%" + itemRequestDto.getName() + "%"));
+            predicates.add(
+                    cb.like(cb.lower(itemJoin.get("itemName")), "%" + itemRequestDto.getName().toLowerCase() + "%"));
         }
         return predicates;
     }
@@ -113,8 +117,63 @@ public class CriteriaRepo {
 
         predicates.add(cb.equal(root.get("deleted"), false));
         if (itemFetch.getName() != null) {
-            predicates.add(cb.like(root.get("itemName"), "%" + itemFetch.getName() + "%"));
+            predicates.add(cb.like(cb.lower(root.get("itemName")), "%" + itemFetch.getName().toLowerCase() + "%"));
         }
+        return predicates;
+    }
+
+    public Page<User> fetchUsers(UserReqDto userReqDto) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+
+        List<Predicate> predicates = this.usersPredicates(userReqDto, cb, root);
+
+        // count
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<User> countRoot = countQuery.from(User.class);
+        List<Predicate> countPredicates = this.usersPredicates(userReqDto, cb, countRoot);
+        countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
+        Long count = em.createQuery(countQuery).getSingleResult();
+
+        // fetch
+        cq.select(root).where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.asc(root.get("id")));
+
+        Pageable pageable = PageRequest.of(userReqDto.getPageNumber(), userReqDto.getPageSize());
+
+        List<User> users = em.createQuery(cq).setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+                .setMaxResults(pageable.getPageSize()).getResultList();
+        return new PageImpl<>(users, pageable, count);
+    }
+
+    private List<Predicate> usersPredicates(UserReqDto userReqDto, CriteriaBuilder cb, Root<User> root) {
+        List<Predicate> predicates = new java.util.ArrayList<>();
+
+        predicates.add(cb.equal(root.get("deleted"), false));
+
+        // check store
+        if (userReqDto.getStoreId() != null) {
+            Join<User, StoreLocation> storeJoin = root.join("storeLocation");
+            predicates.add(cb.equal(storeJoin.get("id"), userReqDto.getStoreId()));
+        }
+
+        // check email
+        if (userReqDto.getEmail() != null) {
+            predicates.add(cb.equal(cb.lower(root.get("email")), userReqDto.getEmail().toLowerCase()));
+        }
+
+        // check store name
+        if (userReqDto.getStoreName() != null) {
+            Join<User, StoreLocation> storeJoin = root.join("storeLocation");
+            predicates.add(cb.equal(cb.lower(storeJoin.get("storeName")), userReqDto.getStoreName().toLowerCase()));
+        }
+
+        // check role
+        if (userReqDto.getRole() != null) {
+            predicates.add(cb.equal(root.get("role"), userReqDto.getRole()));
+        }
+
         return predicates;
     }
 }

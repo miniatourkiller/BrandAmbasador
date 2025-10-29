@@ -1,6 +1,7 @@
 package com.gym.GoldenGym.entities;
 
 import com.gym.GoldenGym.entities.enums.Roles;
+import com.gym.GoldenGym.utils.DateUtils;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +26,14 @@ public class User extends BaseEntity {
     private String idNumber;
     private String password;
     private Roles role;
+    private String otp;
+    @Setter(lombok.AccessLevel.NONE)
+    private String otpExpiry;
     @ManyToOne
     private StoreLocation storeLocation;
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+        this.otpExpiry = DateUtils.dateTodayPlusMinutes(5);
+    }
 }

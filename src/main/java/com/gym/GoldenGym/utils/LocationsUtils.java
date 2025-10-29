@@ -4,6 +4,14 @@ public class LocationsUtils {
     public static boolean isLocationWithinRadius(double latitude1, double longitude1,
             double latitude2, double longitude2,
             double radiusInKm) {
+
+        double distance = getDistance(latitude1, longitude1, latitude2, longitude2);
+        // Check if within radius (assuming radius is in kilometers)
+        return distance <= radiusInKm;
+    }
+
+    public static double getDistance(double latitude1, double longitude1, double latitude2,
+            double longitude2) {
         // Radius of the Earth in kilometers
         final double EARTH_RADIUS = 6371.0;
 
@@ -19,10 +27,7 @@ public class LocationsUtils {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         // Distance between the two points
-        double distance = EARTH_RADIUS * c;
-
-        // Check if within radius (assuming radius is in kilometers)
-        return distance <= radiusInKm;
+        return EARTH_RADIUS * c;
     }
 
 }
