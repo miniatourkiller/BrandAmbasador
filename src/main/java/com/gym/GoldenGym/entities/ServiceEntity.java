@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +26,6 @@ public class ServiceEntity extends BaseEntity {
     private String offerEndDateTime;
     @OneToOne
     private FileEntity image;
-    @ManyToOne
-    private User assignedTo;
 
 
     public void setOfferStartDateTime(String offerStartDateTime) {

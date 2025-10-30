@@ -182,17 +182,17 @@ public class CriteriaRepo {
         return predicates;
     }
 
-    public Page<ServiceOrderEntity> fetchServiceOrders(ServicesReq servicesReq, Long storeId) {
+    public Page<ServiceOrderEntity> fetchServiceOrders(ServicesReq servicesReq, Long storeId, Long clientId) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<ServiceOrderEntity> cq = cb.createQuery(ServiceOrderEntity.class);
         Root<ServiceOrderEntity> root = cq.from(ServiceOrderEntity.class);
 
-        List<Predicate> predicates = this.serviceOrdersPredicates(servicesReq, storeId, cb, root);
+        List<Predicate> predicates = this.serviceOrdersPredicates(servicesReq, storeId, clientId, cb, root);
 
         // count
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<ServiceOrderEntity> countRoot = countQuery.from(ServiceOrderEntity.class);
-        List<Predicate> countPredicates = this.serviceOrdersPredicates(servicesReq, storeId, cb, countRoot);
+        List<Predicate> countPredicates = this.serviceOrdersPredicates(servicesReq, storeId, clientId, cb, countRoot);
         countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
         Long count = em.createQuery(countQuery).getSingleResult();
 
@@ -208,7 +208,8 @@ public class CriteriaRepo {
         return new PageImpl<>(orders, pageable, count);
     }
 
-    private List<Predicate> serviceOrdersPredicates(ServicesReq servicesReq, Long storeId, CriteriaBuilder cb,
+    private List<Predicate> serviceOrdersPredicates(ServicesReq servicesReq, Long storeId, Long clientId,
+            CriteriaBuilder cb,
             Root<ServiceOrderEntity> root) {
         List<Predicate> predicates = new java.util.ArrayList<>();
 
@@ -227,9 +228,15 @@ public class CriteriaRepo {
         }
 
         // check client email
-        if (servicesReq.getClientEmail() != null) {
+        if (clientId != null) {
             Join<ServiceOrderEntity, User> clientJoin = root.join("client");
-            predicates.add(cb.equal(cb.lower(clientJoin.get("email")), servicesReq.getClientEmail().toLowerCase()));
+            predicates.add(cb.equal(clientJoin.get("id"), clientId));
+        } else {
+            if (servicesReq.getClientEmail() != null) {
+                Join<ServiceOrderEntity, User> clientJoin = root.join("client");
+                predicates
+                        .add(cb.equal(cb.lower(clientJoin.get("email")), servicesReq.getClientEmail().toLowerCase()));
+            }
         }
 
         // check order number
@@ -257,17 +264,17 @@ public class CriteriaRepo {
         return predicates;
     }
 
-    public Page<Order> fetchOrders(OrdersReq ordersReq, Long storeId) {
+    public Page<Order> fetchOrders(OrdersReq ordersReq, Long storeId, Long customerId) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Order> cq = cb.createQuery(Order.class);
         Root<Order> root = cq.from(Order.class);
 
-        List<Predicate> predicates = this.ordersPredicates(ordersReq, storeId, cb, root);
+        List<Predicate> predicates = this.ordersPredicates(ordersReq, storeId, customerId, cb, root);
 
         // count
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Order> countRoot = countQuery.from(Order.class);
-        List<Predicate> countPredicates = this.ordersPredicates(ordersReq, storeId, cb, countRoot);
+        List<Predicate> countPredicates = this.ordersPredicates(ordersReq, storeId, customerId, cb, countRoot);
         countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
         Long count = em.createQuery(countQuery).getSingleResult();
 
@@ -282,7 +289,8 @@ public class CriteriaRepo {
         return new PageImpl<>(orders, pageable, count);
     }
 
-    private List<Predicate> ordersPredicates(OrdersReq ordersReq, Long storeId, CriteriaBuilder cb, Root<Order> root) {
+    private List<Predicate> ordersPredicates(OrdersReq ordersReq, Long storeId, Long customerId, CriteriaBuilder cb,
+            Root<Order> root) {
         List<Predicate> predicates = new java.util.ArrayList<>();
 
         predicates.add(cb.equal(root.get("deleted"), false));
@@ -301,9 +309,14 @@ public class CriteriaRepo {
         }
 
         // check client email
-        if (ordersReq.getClientEmail() != null) {
-            Join<Order, User> clientJoin = root.join("client");
-            predicates.add(cb.equal(cb.lower(clientJoin.get("email")), ordersReq.getClientEmail().toLowerCase()));
+        if (customerId != null) {
+            Join<Order, User> clientJoin = root.join("customer");
+            predicates.add(cb.equal(clientJoin.get("id"), customerId));
+        } else {
+            if (ordersReq.getClientEmail() != null) {
+                Join<Order, User> clientJoin = root.join("customer");
+                predicates.add(cb.equal(cb.lower(clientJoin.get("email")), ordersReq.getClientEmail().toLowerCase()));
+            }
         }
 
         // check order number

@@ -10,15 +10,16 @@ import com.gym.GoldenGym.dtos.ServiceAssignStoreDto;
 import com.gym.GoldenGym.dtos.ServiceOrderDto;
 import com.gym.GoldenGym.dtos.ServiceOrderScheduleDto;
 import com.gym.GoldenGym.dtos.reqdtos.OrdersReq;
+import com.gym.GoldenGym.dtos.reqdtos.ServicesReq;
 
 public interface OrderServices {
     public ResponseDto makeOrderDirect(OrderDto orderDto);
 
     public ResponseDto makeOrderFromCart(OrderCart orderCart);
 
-    public ResponseDto getAllOrders(OrdersReq ordersReq);
+    public ResponseDto getAllOrders(OrdersReq ordersReq, String who);
 
-    public ResponseDto getStoreOrders(OrdersReq ordersReq);
+    public ResponseDto getAllServiceOrders(ServicesReq ordersReq, String who);
 
     public ResponseDto assignOrderToStore(AssignStoreDto assignStoreDto);
 
@@ -39,4 +40,8 @@ public interface OrderServices {
     public ResponseDto markServiceCompleted(Long orderId);
 
     public ResponseDto markServicePaidManually(PaymentDto paymentDto);
+
+    public ResponseDto removeOrderPayment(Long orderId);
+
+    public ResponseDto removeServiceOrderPayment(Long orderId);
 }

@@ -15,4 +15,6 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT u FROM User u WHERE u.email LIKE %?1%", nativeQuery = false)
     public Page<User> autocompleteUser(String emailQuery, Pageable pageable);
+
+    public Optional<User> findByIdAndDeletedFalse(Long staffId);
 }
