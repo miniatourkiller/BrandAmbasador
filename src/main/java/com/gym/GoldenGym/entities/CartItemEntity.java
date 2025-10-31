@@ -18,4 +18,6 @@ public class CartItemEntity extends BaseEntity{
     private int units;
     @ManyToOne
     private ItemVariant itemVariant;
+    @ManyToOne
+    private User client;
 }

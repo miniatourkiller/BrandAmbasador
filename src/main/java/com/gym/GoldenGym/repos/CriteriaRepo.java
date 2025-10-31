@@ -8,11 +8,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.gym.GoldenGym.dtos.reqdtos.CartItemsReqDto;
 import com.gym.GoldenGym.dtos.reqdtos.ItemFetch;
 import com.gym.GoldenGym.dtos.reqdtos.OrdersReq;
 import com.gym.GoldenGym.dtos.reqdtos.ServicesReq;
 import com.gym.GoldenGym.dtos.reqdtos.UserReqDto;
 import com.gym.GoldenGym.dtos.reqdtos.VariantRequestDto;
+import com.gym.GoldenGym.entities.CartItemEntity;
 import com.gym.GoldenGym.entities.Category;
 import com.gym.GoldenGym.entities.Item;
 import com.gym.GoldenGym.entities.ItemVariant;
@@ -342,4 +344,50 @@ public class CriteriaRepo {
 
         return predicates;
     }
+
+    public Page<CartItemEntity> fetchCartItems(CartItemsReqDto cartItemReq, Long userId) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<CartItemEntity> cq = cb.createQuery(CartItemEntity.class);
+        Root<CartItemEntity> root = cq.from(CartItemEntity.class);
+
+        List<Predicate> predicates = this.cartItemsPredicates(cartItemReq, userId, cb, root);
+
+        // count
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<CartItemEntity> countRoot = countQuery.from(CartItemEntity.class);
+        List<Predicate> countPredicates = this.cartItemsPredicates(cartItemReq, userId, cb, countRoot);
+        countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
+        Long count = em.createQuery(countQuery).getSingleResult();
+
+        // fetch
+        cq.select(root).where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.asc(root.get("id")));
+
+        Pageable pageable = PageRequest.of(cartItemReq.getPageNumber(), cartItemReq.getPageSize());
+
+        List<CartItemEntity> cartItems = em.createQuery(cq)
+                .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+                .setMaxResults(pageable.getPageSize()).getResultList();
+        return new PageImpl<>(cartItems, pageable, count);
+    }
+
+    private List<Predicate> cartItemsPredicates(CartItemsReqDto cartItemReq, Long userId, CriteriaBuilder cb,
+            Root<CartItemEntity> root) {
+        List<Predicate> predicates = new java.util.ArrayList<>();
+
+        predicates.add(cb.equal(root.get("deleted"), false));
+
+        Join<CartItemEntity, User> clientJoin = root.join("client");
+        predicates.add(cb.equal(clientJoin.get("id"), userId));
+
+        // check item name
+        if (cartItemReq.getItemName() != null) {
+            Join<CartItemEntity, ItemVariant> variantJoin = root.join("itemVariant");
+            Join<ItemVariant, Item> itemJoin = variantJoin.join("item");
+            predicates.add(cb.equal(cb.lower(itemJoin.get("itemName")), cartItemReq.getItemName().toLowerCase()));
+        }
+
+        return predicates;
+    }
+
 }
